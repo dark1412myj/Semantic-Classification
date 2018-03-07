@@ -32,16 +32,37 @@ class Object_Semantic(nn.Module):
         super(Object_Semantic,self).__init__()
         self.lrnn = nn.LSTM(wordsize,hidesize,batch_first=True)
         self.rrnn = nn.LSTM(wordsize, hidesize, batch_first=True)
+        self.fc = nn.Linear(hidesize*2,4)
 
     def forward(self,lx,rx):
-        _,lx = self.lrnn(lx)
-        _,rx = self.rrnn(rx)
-        torch.cat((lx,rx), 1 )
+        #batch* seq_len
+        lx,_ = self.lrnn(lx)
+        rx,_ = self.rrnn(rx)
+        y = torch.cat((lx[:,-1,:],rx[:,1,:]), 1 )
+        y = self.fc(y)
+        y = nn.functional.softmax(y,dim=1)
+        return y
 
+
+def train(model,loader,epoch=1):
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    loss_fun = nn.CrossEntropyLoss()
+    for _ in range(epoch):
+        for (lx,rx, y_) in loader:
+            y_ = Variable(y_)
+            lx = Variable(lx)
+            rx = Variable(rx)
+            y = model(lx,rx)
+            loss = loss_fun(y,y_.max(1)[1])
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+    return model
+
+def test(model,lx,rx,y_):
+    y = model(Variable(torch.Tensor(lx)),Variable(torch.Tensor(rx)) )
+    y = y.max(1)[1]
 
 if __name__ == '__main__':
-    for (x, y, z) in train_loader:
-        print(x.size())
-        print(y.size())
-        print(z.size())
-        exit()
+    model = Object_Semantic(100,128)
+    train(model,train_loader)
