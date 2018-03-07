@@ -8,6 +8,7 @@ w2cmodel = Word2Vec.load("./50features_1minwords_10context")
 POS_DIC = {"X":0,"O":1,"B":2,"I":3}
 DIC_LEN = len(POS_DIC)
 
+
 def get_basic_data(sentences_X,sentences_Y,filepath):
     f = open(filepath)
     list_X = []
@@ -181,6 +182,7 @@ def get_eosc_data(): # evaluation sentiment classification
 
     return train_X_F,train_X_B,train_Y,test_X_F,test_X_B,test_Y
 
+
 def test():
     sentences_train_X = []
     sentences_test_X = []
@@ -193,7 +195,25 @@ def test():
     # print(sentences_test_Y)
 
 
+def get_input_len(X):
+    seq_len = []
+    for i in range(X.shape[0]):
+        cnt = 0
+        for j in range(X.shape[1]):
+            if np.any( X[i][j] != 0.0 ) :
+                cnt+=1
+        seq_len.append(cnt)
+    return seq_len
+
+
 if __name__ == "__main__":
     # test()
-    train_X_F, train_X_B, train_Y, test_X_F, test_X_B, test_Y = get_eosc_data()
-    print(train_X_F)
+    #train_X_F, train_X_B, train_Y, test_X_F, test_X_B, test_Y = get_eosc_data()
+    #print(train_X_F) // input
+    train_X,train_Y,test_X,test_Y  = return_eoa_data()
+    print(test_X.shape)
+    #print( get_input_len(train_X) )
+    print( get_input_len(test_X)>0 )
+
+
+
