@@ -54,8 +54,6 @@ class Bio(nn.Module):
 
 
 def train(model,loader,epoch=1):
-    for param in model.parameters():
-        param.data.uniform_(-0.08, 0.08)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     loss_fun = nn.CrossEntropyLoss()
     for _ in range(epoch):
@@ -97,6 +95,8 @@ def test(model,x,y_):
 
 if __name__ == "__main__":
     model = Bio(50,128)
+    for param in model.parameters():
+        param.data.uniform_(-0.08, 0.08)
     y_ = torch.Tensor(test_Y)
     y_ = Variable(y_.max(2)[1])#np.argmax(test_Y, 2)
     test(model, test_X, y_)
