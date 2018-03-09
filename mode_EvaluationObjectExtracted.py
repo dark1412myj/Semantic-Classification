@@ -100,6 +100,5 @@ if __name__ == "__main__":
     y_ = torch.Tensor(test_Y)
     y_ = Variable(y_.max(2)[1])#np.argmax(test_Y, 2)
     test(model, test_X, y_)
-    for _ in range(6):
-        model = train(model, train_loader)
-        test(model, test_X, y_)
+    model = train(model, train_loader,6)
+    test(model, test_X, y_)

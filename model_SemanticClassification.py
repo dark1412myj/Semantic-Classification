@@ -21,6 +21,7 @@ class BioDataSet(data.Dataset):
     def __len__(self):
         return len(self.data_lx)
 
+
 train_loader = torch.utils.data.DataLoader(
     BioDataSet(train_X_F,train_X_B,train_Y),
     batch_size = 10,
@@ -35,12 +36,11 @@ class Object_Semantic(nn.Module):
         self.fc = nn.Linear(hidesize*2,4)
 
     def forward(self,lx,rx):
-        #batch* seq_len
         lx,_ = self.lrnn(lx)
         rx,_ = self.rrnn(rx)
         y = torch.cat((lx[:,-1,:],rx[:,1,:]), 1 )
         y = self.fc(y)
-        y = nn.functional.softmax(y,dim=1)
+        y = nn.functional.softmax(y)
         return y
 
 
@@ -60,9 +60,21 @@ def train(model,loader,epoch=1):
     return model
 
 def test(model,lx,rx,y_):
+    #print(y_.shape)
     y = model(Variable(torch.Tensor(lx)),Variable(torch.Tensor(rx)) )
+    y_ = Variable(torch.Tensor(y_))
+    y_ = y_.max(1)[1]
     y = y.max(1)[1]
+    print( (y_ == y).sum().data[0],'/',y.size()[0] )
+    # print(y_.size())
+    # print(y.size())
+    #print(y_ == y)
 
 if __name__ == '__main__':
     model = Object_Semantic(100,128)
-    train(model,train_loader)
+    for param in model.parameters():
+        param.data.uniform_(-0.08, 0.08)
+    test(model, test_X_F, test_X_B, test_Y)
+    model = train(model,train_loader,5)
+    test(model, test_X_F, test_X_B, test_Y)
+    #test(model,test_X_F,test_X_B,test_Y)
