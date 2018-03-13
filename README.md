@@ -15,3 +15,10 @@
 * 构造下面model，使用cross_entropy作为loss函数：
 
 ![alt text]( https://github.com/dark1412myj/IMageBase/blob/master/Semantic-Classification_1.jpg )
+
+## 评价对象情感分析
+
+* 将每个单词与评价对象进行拼接，形成100维的vector，使用两个lstm，分别处理评价对象前和后的词，将两个lstm的结果通过fc得到最终分析结果
+* 构造下面model，使用cross_entropy作为loss函数：
+
+![alt text]( https://github.com/dark1412myj/IMageBase/blob/master/Semantic-Classification_2.jpg )
